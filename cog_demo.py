@@ -12,10 +12,14 @@ vae = AutoencoderKLCogVideoX.from_pretrained(f"{model_dir}/Video-As-Prompt-CogVi
 transformer = CogVideoXTransformer3DMOTModel.from_pretrained(f"{model_dir}/Video-As-Prompt-CogVideoX-5B", torch_dtype=torch.bfloat16, subfolder="transformer")
 pipe = CogVideoXImageToVideoMOTPipeline.from_pretrained(
     f"{model_dir}/Video-As-Prompt-CogVideoX-5B", vae=vae, transformer=transformer, torch_dtype=torch.bfloat16,
-).to("cuda")
+)
+# Memory optimization: enable sequential CPU offload for layer-by-layer offloading
+# This reduces memory from ~40GB to max around 7.5GB
+# Alternative: use pipe.enable_model_cpu_offload() for module-level offloading (~30GB)
+pipe.enable_sequential_cpu_offload()
 
 
-n_frames = 16
+n_frames = 49
 height = 480
 width = 720
 
