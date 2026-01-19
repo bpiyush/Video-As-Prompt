@@ -23,17 +23,41 @@ n_frames = 49
 height = 480
 width = 720
 
-ref_video = load_video("assets/videos/demo/object-725.mp4")
-image = Image.open("assets/images/demo/animal-2.jpg").convert("RGB")
+# ref_path = "assets/videos/demo/object-725.mp4"
+ref_path = "../JohanssonBench/examples/S014C001P007R002A008.mp4"
+ref_video = load_video(ref_path)
+
+# img_path = "assets/images/demo/animal-2.jpg"
+img_path = "./man_standing_near_couch.png"
+image = Image.open(img_path).convert("RGB")
+
 idx = torch.linspace(0, len(ref_video) - 1, n_frames).long().tolist()
 ref_frames = [ref_video[i] for i in idx]
+
+
+prompt = "A chestnut-colored horse stands on a grassy hill against a backdrop of distant, snow-dusted mountains. "\
+    "The horse begins to inflate, its defined, muscular body swelling and rounding into a smooth, balloon-like form"\
+    " while retaining its rich, brown hide color. Without changing its orientation, the now-buoyant horse lifts silently"\
+    "from the ground. It begins a steady vertical ascent, rising straight up and eventually floating out of the top of the frame."\
+    "The camera remains completely static throughout the entire sequence, holding a fixed shot on the landscape as the horse "\
+    "transforms and departs, ensuring the verdant hill and mountain range in the background stay perfectly still."
+prompt = "Photo of a man about to perform an action."
+
+
+prompt_mot_ref = "A hand holds up a single beige sneaker decorated with gold calligraphy and floral illustrations,"\
+    " with small green plants tucked inside. The sneaker immediately begins to inflate like a balloon, its shape "\
+    "distorting as the decorative details stretch and warp across the expanding surface. It rapidly transforms into a perfectly smooth, "\
+    "matte beige sphere, inheriting the primary color from the original shoe. Once the transformation is complete, the new balloon-like object "\
+    "quickly ascends, moving straight up and exiting the top of the frame. "\
+    "The camera remains completely static and the plain white background is unchanged throughout the entire sequence."
+prompt_mot_ref = "A johansson's point light display shows an action being performed by person(s)."
 
 output_frames = pipe(
     image=image,
     ref_videos=[ref_frames],
-    prompt="A chestnut-colored horse stands on a grassy hill against a backdrop of distant, snow-dusted mountains. The horse begins to inflate, its defined, muscular body swelling and rounding into a smooth, balloon-like form while retaining its rich, brown hide color. Without changing its orientation, the now-buoyant horse lifts silently from the ground. It begins a steady vertical ascent, rising straight up and eventually floating out of the top of the frame. The camera remains completely static throughout the entire sequence, holding a fixed shot on the landscape as the horse transforms and departs, ensuring the verdant hill and mountain range in the background stay perfectly still.",
+    prompt=prompt,
     prompt_mot_ref=[
-      "A hand holds up a single beige sneaker decorated with gold calligraphy and floral illustrations, with small green plants tucked inside. The sneaker immediately begins to inflate like a balloon, its shape distorting as the decorative details stretch and warp across the expanding surface. It rapidly transforms into a perfectly smooth, matte beige sphere, inheriting the primary color from the original shoe. Once the transformation is complete, the new balloon-like object quickly ascends, moving straight up and exiting the top of the frame. The camera remains completely static and the plain white background is unchanged throughout the entire sequence."
+      prompt_mot_ref
     ],
     height=height,
     width=width,
@@ -41,4 +65,4 @@ output_frames = pipe(
     frames_selection="evenly",
     use_dynamic_cfg=True,
 ).frames[0]
-export_to_video(output_frames, "cog_demo.mp4", fps=10)
+export_to_video(output_frames, "cog_demo_johansson.mp4", fps=10)
